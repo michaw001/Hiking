@@ -1,6 +1,8 @@
 instance/
 user_data/
+data/
 .env
+.env.docker
 __pycache__/
 *.pyc
 *.db

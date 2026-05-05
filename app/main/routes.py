@@ -1,7 +1,7 @@
 from collections import defaultdict
 from pathlib import Path
 
-from flask import render_template, redirect, url_for, flash, send_file, request, abort
+from flask import render_template, redirect, url_for, flash, send_file, request, abort, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
@@ -13,6 +13,11 @@ from ..gpx.map_all import build_all_map, YEAR_COLORS
 from ..gpx.excel_export import generate_xlsx_for_user
 from . import main_bp
 from .forms import UploadForm
+
+
+@main_bp.route("/health")
+def health():
+    return jsonify({"status": "ok"}), 200
 
 
 def invalidate_maps(user_id, years=None):

@@ -1,3 +1,4 @@
+import click
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -38,5 +39,25 @@ def create_app():
     from .main import main_bp
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(main_bp)
+
+    @app.cli.command("create-admin")
+    @click.option("--username", required=True)
+    @click.option("--password", required=True)
+    @click.option("--email", required=True)
+    @click.option("--if-none", "if_none", is_flag=True, default=False)
+    def create_admin(username, password, email, if_none):
+        if if_none and User.query.first():
+            click.echo("User bereits vorhanden – übersprungen.")
+            return
+        if User.query.filter_by(username=username).first():
+            click.echo(f"User '{username}' bereits vorhanden – übersprungen.")
+            return
+        user = User(username=username, email=email)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        user.get_gpx_dir().mkdir(parents=True, exist_ok=True)
+        user.get_maps_dir().mkdir(parents=True, exist_ok=True)
+        click.echo(f"User '{username}' erstellt.")
 
     return app
