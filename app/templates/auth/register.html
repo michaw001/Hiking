@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Registrieren – Hiking{% endblock %}
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <h1>🥾 Hiking</h1>
+    <h2>Registrieren</h2>
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.username.label }}
+        {{ form.username(class="form-control", autofocus=true) }}
+        {% for error in form.username.errors %}
+          <span class="field-error">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        {{ form.email.label }}
+        {{ form.email(class="form-control") }}
+        {% for error in form.email.errors %}
+          <span class="field-error">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        {{ form.password.label }}
+        {{ form.password(class="form-control") }}
+        {% for error in form.password.errors %}
+          <span class="field-error">{{ error }}</span>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        {{ form.confirm.label }}
+        {{ form.confirm(class="form-control") }}
+        {% for error in form.confirm.errors %}
+          <span class="field-error">{{ error }}</span>
+        {% endfor %}
+      </div>
+      {{ form.submit(class="btn btn-primary btn-full") }}
+    </form>
+    <p class="auth-link">Schon registriert? <a href="{{ url_for('auth.login') }}">Anmelden</a></p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+instance/
+user_data/
+.env
+__pycache__/
+*.pyc
+*.db
+*.xlsx
+migrations/versions/
+.DS_Store

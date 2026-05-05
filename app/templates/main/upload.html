@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Upload – Hiking{% endblock %}
+{% block content %}
+<div class="upload-container">
+  <h1>GPX-Touren hochladen</h1>
+  <p class="upload-hint">Wähle eine oder mehrere GPX-Dateien aus der Maps 3D App.</p>
+
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="drop-area" id="dropArea">
+      <div class="drop-icon">📂</div>
+      <p>GPX-Dateien hier ablegen oder <label for="gpx_files" class="file-label">auswählen</label></p>
+      {{ form.gpx_files(id="gpx_files", accept=".gpx", multiple=true, class="file-input") }}
+      <p id="fileCount" class="file-count"></p>
+    </div>
+    {% for error in form.gpx_files.errors %}
+      <span class="field-error">{{ error }}</span>
+    {% endfor %}
+    {{ form.submit(class="btn btn-primary", id="submitBtn") }}
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Abbrechen</a>
+  </form>
+</div>
+
+<script>
+const input = document.getElementById('gpx_files');
+const count = document.getElementById('fileCount');
+const dropArea = document.getElementById('dropArea');
+
+input.addEventListener('change', () => {
+  const n = input.files.length;
+  count.textContent = n > 0 ? `${n} Datei(en) ausgewählt` : '';
+});
+
+['dragenter','dragover'].forEach(e => dropArea.addEventListener(e, ev => {
+  ev.preventDefault(); dropArea.classList.add('drag-over');
+}));
+['dragleave','drop'].forEach(e => dropArea.addEventListener(e, ev => {
+  ev.preventDefault(); dropArea.classList.remove('drag-over');
+}));
+dropArea.addEventListener('drop', ev => {
+  const dt = new DataTransfer();
+  Array.from(ev.dataTransfer.files).forEach(f => dt.items.add(f));
+  input.files = dt.files;
+  const n = input.files.length;
+  count.textContent = n > 0 ? `${n} Datei(en) ausgewählt` : '';
+});
+</script>
+{% endblock %}

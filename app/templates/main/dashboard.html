@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Meine Wanderungen – Hiking{% endblock %}
+{% block content %}
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-icon">🥾</div>
+    <h1>Meine Wanderungen</h1>
+    {% if year_min %}
+      <p class="hero-years">{{ year_min }}{% if year_max != year_min %} – {{ year_max }}{% endif %}</p>
+    {% endif %}
+    <div class="badges">
+      <div class="badge">
+        <span class="badge-value">{{ totals.tours }}</span>
+        <span class="badge-label">Touren</span>
+      </div>
+      <div class="badge">
+        <span class="badge-value">{{ "%.0f"|format(totals.km) }}</span>
+        <span class="badge-label">Kilometer</span>
+      </div>
+      <div class="badge">
+        <span class="badge-value">{{ "%.0f"|format(totals.ascent) }}</span>
+        <span class="badge-label">Hm Aufstieg</span>
+      </div>
+      <div class="badge">
+        <span class="badge-value">{{ "%.0f"|format(totals.hours) }}</span>
+        <span class="badge-label">Stunden</span>
+      </div>
+    </div>
+    <a href="{{ url_for('main.upload') }}" class="btn btn-hero">+ Touren hochladen</a>
+  </div>
+</div>
+
+<div class="cards-section">
+  {% if years %}
+    <a href="{{ url_for('main.map_all') }}" class="card card-all" target="_blank">
+      <div class="card-stripe" style="background: linear-gradient(135deg,
+        {% for y in years %}{{ year_colors.get(y, '#555') }}{% if not loop.last %}, {% endif %}{% endfor %});"></div>
+      <div class="card-body">
+        <h3>Alle Touren auf einer Karte</h3>
+        <p>{{ totals.tours }} Touren · {{ year_min }}{% if year_max != year_min %} – {{ year_max }}{% endif %}</p>
+      </div>
+    </a>
+
+    <div class="year-grid">
+      {% for year in years|reverse %}
+        {% set y = yearly[year] %}
+        <a href="{{ url_for('main.map_year', year=year) }}" class="card card-year" target="_blank">
+          <div class="card-stripe" style="background: {{ year_colors.get(year, '#546E7A') }};"></div>
+          <div class="card-body">
+            <h3>{{ year }}</h3>
+            <div class="year-stats">
+              <span>{{ y.count }} Touren</span>
+              <span>{{ "%.0f"|format(y.km) }} km</span>
+              <span>{{ "%.0f"|format(y.ascent) }} Hm</span>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>Noch keine Touren vorhanden.</p>
+      <a href="{{ url_for('main.upload') }}" class="btn btn-primary">GPX-Dateien hochladen</a>
+    </div>
+  {% endif %}
+</div>
+
+<footer class="site-footer">
+  {{ totals.tours }} Touren · Maps 3D App · Hiking
+</footer>
+{% endblock %}
