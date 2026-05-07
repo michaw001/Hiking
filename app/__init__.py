@@ -1,3 +1,4 @@
+import os
 import click
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -42,10 +43,13 @@ def create_app():
 
     @app.cli.command("create-admin")
     @click.option("--username", required=True)
-    @click.option("--password", required=True)
     @click.option("--email", required=True)
     @click.option("--if-none", "if_none", is_flag=True, default=False)
-    def create_admin(username, password, email, if_none):
+    def create_admin(username, email, if_none):
+        password = os.environ.get("ADMIN_PASSWORD")
+        if not password:
+            click.echo("Fehler: ADMIN_PASSWORD nicht gesetzt.", err=True)
+            raise SystemExit(1)
         if if_none and User.query.first():
             click.echo("User bereits vorhanden – übersprungen.")
             return

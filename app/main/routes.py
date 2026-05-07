@@ -5,6 +5,7 @@ from flask import render_template, redirect, url_for, flash, send_file, request,
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
+from sqlalchemy import text
 from .. import db
 from ..models import Tour, MapCache
 from ..gpx.parser import parse_gpx
@@ -17,7 +18,11 @@ from .forms import UploadForm
 
 @main_bp.route("/health")
 def health():
-    return jsonify({"status": "ok"}), 200
+    try:
+        db.session.execute(text("SELECT 1"))
+        return jsonify({"status": "ok"}), 200
+    except Exception:
+        return jsonify({"status": "error", "detail": "db unreachable"}), 503
 
 
 def invalidate_maps(user_id, years=None):

@@ -20,4 +20,4 @@ ENV FLASK_APP=run.py \
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8088/health')" || exit 1
 
-CMD ["sh", "-c", "flask db upgrade && flask create-admin --username \"$ADMIN_USERNAME\" --password \"$ADMIN_PASSWORD\" --email \"$ADMIN_EMAIL\" --if-none && gunicorn run:app --workers 3 --bind 0.0.0.0:8088 --timeout 120 --access-logfile - --error-logfile -"]
+CMD ["sh", "-c", "flask db upgrade && flask create-admin --username \"$ADMIN_USERNAME\" --email \"$ADMIN_EMAIL\" --if-none && gunicorn run:app --workers 3 --bind 0.0.0.0:8088 --timeout 120 --access-logfile - --error-logfile -"]
