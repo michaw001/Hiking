@@ -31,7 +31,7 @@ deploy: build push
 	rsync -az docker-compose.yml .env.docker $(SSH_USER)@$(SERVER):$(DEPLOY_PATH)/
 	@echo ">>> App auf Server neu starten..."
 	$(SSH) "cd $(DEPLOY_PATH) && docker compose pull && docker compose up -d"
-	@echo ">>> Fertig. App läuft auf http://$(SERVER):8088"
+	@echo ">>> Fertig. App läuft auf http://$(SERVER):8089"
 
 build:
 	@echo ">>> Image bauen: $(FULL_IMAGE)"
