@@ -320,5 +320,46 @@ def build_all_map(gpx_dir, output_path):
 </script>"""
     m.get_root().html.add_child(folium.Element(highlight_script))
 
+    select_all_script = """
+<script>
+(function() {
+  setTimeout(function() {
+    var overlays = document.querySelector('.leaflet-control-layers-overlays');
+    if (!overlays) return;
+
+    var allDiv = document.createElement('div');
+    allDiv.style.cssText = 'border-bottom:1px solid #ccc;margin-bottom:5px;padding-bottom:5px;';
+    var label = document.createElement('label');
+    label.style.cssText = 'display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:bold;';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = true;
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' Alle'));
+    allDiv.appendChild(label);
+    overlays.insertBefore(allDiv, overlays.firstChild);
+
+    function updateMaster() {
+      var items = Array.from(overlays.querySelectorAll('input[type="checkbox"]')).filter(function(c){ return c !== cb; });
+      var n = items.filter(function(c){ return c.checked; }).length;
+      cb.checked = n === items.length;
+      cb.indeterminate = n > 0 && n < items.length;
+    }
+
+    cb.addEventListener('change', function() {
+      var want = cb.checked;
+      overlays.querySelectorAll('input[type="checkbox"]').forEach(function(c) {
+        if (c !== cb && c.checked !== want) c.click();
+      });
+    });
+
+    overlays.querySelectorAll('input[type="checkbox"]').forEach(function(c) {
+      if (c !== cb) c.addEventListener('change', updateMaster);
+    });
+  }, 300);
+})();
+</script>"""
+    m.get_root().html.add_child(folium.Element(select_all_script))
+
     m.save(str(output_path))
     return str(output_path)
