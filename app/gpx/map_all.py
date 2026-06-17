@@ -160,16 +160,24 @@ def make_popup_html(tour):
         <tr><td style="color:#777;padding:2px 8px 2px 0">Ø Tempo</td>
             <td>{spd}</td></tr>
       </table>
+      <div style="text-align:right;margin-top:6px">
+        <button onclick="deleteTour({tour['tour_id']})" title="Tour ausblenden"
+                style="background:none;border:none;cursor:pointer;font-size:15px;
+                       color:#c0392b;padding:2px 4px;line-height:1">🗑</button>
+      </div>
     </div>"""
 
 
-def build_all_map(gpx_dir, output_path):
+def build_all_map(gpx_dir, output_path, tour_lookup):
     tours = []
     for fname in sorted(os.listdir(gpx_dir)):
         if not fname.lower().endswith(".gpx"):
             continue
+        if fname not in tour_lookup:
+            continue
         result = parse_gpx_for_all_map(os.path.join(gpx_dir, fname))
         if result and result["segments"]:
+            result["tour_id"] = tour_lookup[fname]
             tours.append(result)
 
     if not tours:
@@ -282,6 +290,12 @@ def build_all_map(gpx_dir, output_path):
   var tourData = {json.dumps(tour_poly_map)};
   var activeTour = null;
   var mapObj = window["{m.get_name()}"];
+
+  window.deleteTour = function(id) {{
+    if (!confirm('Diese Tour wirklich ausblenden?')) return;
+    fetch('/tour/' + id + '/delete', {{method: 'POST'}})
+      .then(function(r) {{ if (r.ok) {{ location.reload(); }} else {{ alert('Ausblenden fehlgeschlagen.'); }} }});
+  }};
 
   function applyStyle(name, color, weight, opacity) {{
     var l = window[name];

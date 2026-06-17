@@ -47,7 +47,8 @@ def invalidate_maps(user_id, years=None):
 @main_bp.route("/")
 @login_required
 def dashboard():
-    tours = Tour.query.filter_by(user_id=current_user.id).order_by(Tour.tour_date).all()
+    tours = (Tour.query.filter_by(user_id=current_user.id, is_hidden=False)
+             .order_by(Tour.tour_date).all())
 
     yearly = defaultdict(lambda: {"count": 0, "km": 0.0, "ascent": 0.0, "duration_h": 0.0})
     for t in tours:
@@ -164,7 +165,9 @@ def map_year(year):
     output_path = maps_dir / f"map_year_{year}.html"
     gpx_dir = str(current_user.get_gpx_dir())
 
-    result = build_year_map(year, gpx_dir, output_path)
+    tour_lookup = {t.filename: t.id for t in
+                   Tour.query.filter_by(user_id=current_user.id, is_hidden=False).all()}
+    result = build_year_map(year, gpx_dir, output_path, tour_lookup)
     if result is None:
         flash(f"Keine Touren für {year} gefunden.", "warning")
         return redirect(url_for("main.dashboard"))
@@ -192,7 +195,9 @@ def map_all():
     output_path = maps_dir / "map_all.html"
     gpx_dir = str(current_user.get_gpx_dir())
 
-    result = build_all_map(gpx_dir, output_path)
+    tour_lookup = {t.filename: t.id for t in
+                   Tour.query.filter_by(user_id=current_user.id, is_hidden=False).all()}
+    result = build_all_map(gpx_dir, output_path, tour_lookup)
     if result is None:
         flash("Noch keine Touren vorhanden.", "warning")
         return redirect(url_for("main.dashboard"))
@@ -211,7 +216,8 @@ def map_all():
 @main_bp.route("/export/xlsx")
 @login_required
 def export_xlsx():
-    tours = Tour.query.filter_by(user_id=current_user.id).order_by(Tour.tour_date).all()
+    tours = (Tour.query.filter_by(user_id=current_user.id, is_hidden=False)
+             .order_by(Tour.tour_date).all())
     buf = generate_xlsx_for_user(tours)
     return send_file(
         buf,
@@ -226,12 +232,8 @@ def export_xlsx():
 def delete_tour(tour_id):
     tour = Tour.query.filter_by(id=tour_id, user_id=current_user.id).first_or_404()
     year = tour.tour_date.year if tour.tour_date else None
-    gpx_path = Path(tour.gpx_path)
-    db.session.delete(tour)
+    tour.is_hidden = True
     db.session.commit()
-    if gpx_path.exists():
-        gpx_path.unlink()
     if year:
         invalidate_maps(current_user.id, {year})
-    flash("Tour gelöscht.", "success")
-    return redirect(url_for("main.dashboard"))
+    return "", 204

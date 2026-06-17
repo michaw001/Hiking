@@ -47,6 +47,8 @@ class Tour(db.Model):
     max_ele_m = db.Column(db.Float, nullable=True)
     num_points = db.Column(db.Integer, nullable=True)
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_hidden = db.Column(db.Boolean, nullable=False, default=False,
+                          server_default=db.false(), index=True)
 
     def to_dict(self):
         return {
