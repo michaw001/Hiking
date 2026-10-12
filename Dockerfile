@@ -7,8 +7,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN rm -f .env .env.docker
-
 RUN mkdir -p /app/data /app/user_data
 
 EXPOSE 8088

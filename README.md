@@ -79,7 +79,7 @@ python run.py                          # -> http://127.0.0.1:5001
 | `USER_DATA_DIR`  | –      | Ablage für GPX-Dateien + generierte Karten (Default `user_data/`) |
 
 Lokal liegen diese in `.env`, für Docker in `.env.docker` (beide sind in `.gitignore`
-und werden nicht ins Image gebacken).
+und `.dockerignore` und werden nicht ins Image gebacken).
 
 ## GPX-Import (bestehende Dateien)
 

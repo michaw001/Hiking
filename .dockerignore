@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+.env.*
+instance/
+user_data/
+data/
+*.db
+*.xlsx
+**/__pycache__/
+**/*.pyc
+**/.DS_Store
+README.md
