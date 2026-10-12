@@ -302,7 +302,7 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
 (function() {{
   var tourData = {json.dumps(tour_poly_map)};
   var activeTour = null;
-  var mapObj = window["{m.get_name()}"];
+  var mapObj = null;
 
   window.deleteTour = function(id) {{
     if (!confirm('Diese Tour wirklich ausblenden?')) return;
@@ -334,6 +334,7 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
   }}
 
   setTimeout(function() {{
+    mapObj = window["{m.get_name()}"];
     Object.keys(tourData).forEach(function(key) {{
       tourData[key].layers.forEach(function(name) {{
         var l = window[name];
