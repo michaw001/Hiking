@@ -35,7 +35,7 @@ deploy: build push
 
 build:
 	@echo ">>> Image bauen: $(FULL_IMAGE)"
-	docker build -t $(FULL_IMAGE) .
+	docker buildx build --platform linux/amd64 -t $(FULL_IMAGE) --load .
 
 push:
 	@echo ">>> Image in Registry pushen: $(FULL_IMAGE)"
