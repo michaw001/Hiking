@@ -306,7 +306,7 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
 
   window.deleteTour = function(id) {{
     if (!confirm('Diese Tour wirklich ausblenden?')) return;
-    fetch('/tour/' + id + '/delete', {{method: 'POST'}})
+    fetch('/tour/' + id + '/delete', {{method: 'POST', headers: {{'X-Requested-With': 'fetch'}}}})
       .then(function(r) {{ if (r.ok) {{ location.reload(); }} else {{ alert('Ausblenden fehlgeschlagen.'); }} }});
   }};
 

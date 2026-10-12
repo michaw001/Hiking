@@ -12,3 +12,5 @@ class Config:
     UPLOAD_EXTENSIONS = {".gpx"}
     USER_DATA_DIR = Path(os.environ.get("USER_DATA_DIR", str(BASE_DIR / "user_data")))
     WTF_CSRF_ENABLED = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    REMEMBER_COOKIE_SAMESITE = "Lax"

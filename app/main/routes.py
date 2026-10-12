@@ -230,6 +230,9 @@ def export_xlsx():
 @main_bp.route("/tour/<int:tour_id>/delete", methods=["POST"])
 @login_required
 def delete_tour(tour_id):
+    # Fremde Seiten koennen diesen Header nicht setzen (Preflight scheitert).
+    if request.headers.get("X-Requested-With") != "fetch":
+        abort(403)
     tour = Tour.query.filter_by(id=tour_id, user_id=current_user.id).first_or_404()
     year = tour.tour_date.year if tour.tour_date else None
     tour.is_hidden = True
