@@ -59,7 +59,7 @@ ps:
 clean-registry:
 	@echo ">>> Manifest-Digest aus Registry lesen..."
 	@DIGEST=$$(curl -sI \
-	    -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+	    -H "Accept: application/vnd.oci.image.index.v1+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json" \
 	    http://$(REGISTRY)/v2/$(IMAGE_NAME)/manifests/$(IMAGE_TAG) \
 	    | grep -i "docker-content-digest" | tr -d '\r' | awk '{print $$2}'); \
 	if [ -z "$$DIGEST" ]; then \
