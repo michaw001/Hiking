@@ -12,6 +12,7 @@ oder als Docker-Container im Heimnetz.
   - Jahres-Karten – eingefärbt nach Monat, Layer-Steuerung pro Monat
   - Gesamt-Karte – eingefärbt nach Jahr, Tracks via Ramer-Douglas-Peucker vereinfacht
   - Klick auf einen Trail hebt die Tour hervor; Popup mit Datum, Distanz, Dauer, Ø-Tempo
+  - **Doppelklick** auf Track, Datums-Label oder Startpunkt zoomt auf die komplette Tour
   - **Tour ausblenden** per 🗑-Button im Popup (Soft-Delete, siehe unten)
 - **Excel-Export** der Wanderstatistik (`.xlsx`)
 - **Login/Registrierung** (Flask-Login), benutzergetrennte Daten

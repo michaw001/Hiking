@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 import folium
 from folium.plugins import MiniMap
-from .parser import haversine
+from .parser import haversine, segments_bounds
 
 MAX_SPEED_KMH = 25.0
 MAX_GAP_SEC = 900
@@ -230,12 +230,12 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
             poly.add_to(layer)
             tour_polys.append(poly.get_name())
 
-        tour_poly_map[tour_key] = {"layers": tour_polys, "color": color, "weight": 3, "opacity": 0.75}
+        tour_markers = []
 
         if tour["segments"]:
             longest_seg = max(tour["segments"], key=len)
             mid = longest_seg[len(longest_seg) // 2]
-            folium.Marker(
+            label_marker = folium.Marker(
                 location=mid,
                 icon=folium.DivIcon(
                     html=f'<div style="background:{color};color:white;font-size:9px;'
@@ -248,10 +248,12 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
                 ),
                 popup=folium.Popup(popup_html, max_width=230),
                 tooltip=hover_text,
-            ).add_to(layer)
+            )
+            label_marker.add_to(layer)
+            tour_markers.append(label_marker.get_name())
 
         start = tour["segments"][0][0]
-        folium.CircleMarker(
+        start_marker = folium.CircleMarker(
             location=start,
             radius=4,
             color="white",
@@ -261,7 +263,18 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
             fill_opacity=1.0,
             popup=folium.Popup(popup_html, max_width=230),
             tooltip=hover_text,
-        ).add_to(layer)
+        )
+        start_marker.add_to(layer)
+        tour_markers.append(start_marker.get_name())
+
+        tour_poly_map[tour_key] = {
+            "layers": tour_polys,
+            "markers": tour_markers,
+            "bounds": segments_bounds(tour["segments"]),
+            "color": color,
+            "weight": 3,
+            "opacity": 0.75,
+        }
 
     legend_rows = "".join(
         f'<tr><td><span style="display:inline-block;width:16px;height:10px;'
@@ -277,7 +290,7 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
                 font-family:Arial,sans-serif">
       <b style="font-size:13px">Alle Wanderungen</b>
       <table style="margin-top:6px;border-collapse:collapse">{legend_rows}</table>
-      <div style="margin-top:6px;font-size:11px;color:#888">{len(tours)} Touren gesamt · Klick = Details</div>
+      <div style="margin-top:6px;font-size:11px;color:#888">{len(tours)} Touren gesamt · Klick = Details · Doppelklick = Zoom</div>
     </div>"""
     m.get_root().html.add_child(folium.Element(legend_html))
 
@@ -315,6 +328,11 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
     td.layers.forEach(function(n) {{ applyStyle(n, td.color, td.weight, td.opacity); }});
   }}
 
+  function zoomToTour(key) {{
+    mapObj.closePopup();
+    mapObj.fitBounds(tourData[key].bounds, {{padding: [50, 50], maxZoom: 17}});
+  }}
+
   setTimeout(function() {{
     Object.keys(tourData).forEach(function(key) {{
       tourData[key].layers.forEach(function(name) {{
@@ -323,6 +341,15 @@ def build_all_map(gpx_dir, output_path, tour_lookup):
         l.on('click', function(e) {{
           highlight(key);
           L.DomEvent.stopPropagation(e);
+        }});
+      }});
+      tourData[key].layers.concat(tourData[key].markers).forEach(function(name) {{
+        var l = window[name];
+        if (!l) return;
+        l.on('dblclick', function(e) {{
+          L.DomEvent.stopPropagation(e);
+          highlight(key);
+          zoomToTour(key);
         }});
       }});
     }});

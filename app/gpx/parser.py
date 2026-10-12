@@ -16,6 +16,13 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
+def segments_bounds(segments):
+    pts = [pt for seg in segments for pt in seg]
+    lats = [p[0] for p in pts]
+    lons = [p[1] for p in pts]
+    return [[min(lats), min(lons)], [max(lats), max(lons)]]
+
+
 def parse_gpx(filepath):
     try:
         tree = ET.parse(filepath)
